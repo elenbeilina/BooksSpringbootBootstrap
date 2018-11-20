@@ -22,7 +22,7 @@
     <h1>Books</h1>
 
     <p>
-        <a href="/bookEdit" th:href="@{/bookEdit}"class="btn btn-primary" role="button">Create</a>
+        <a href="/book/new"class="btn btn-primary" role="button">Create</a>
     </p>
 
     <table class="table">
@@ -38,8 +38,8 @@
             <td th:text="${book.title}">Test</td>
             <td th:text="${book.author}">Test1</td>
             <td>
-                <a href="/bookEdit/1" th:href="@{/bookEdit/__${book.id}__}"class="btn btn-info" role="button">Edit</a>
-                <a href="/bookDelete/1" th:href="@{/bookDelete/__${book.id}__}"class="btn btn-danger" role="button">Delete</a>
+                <a href="/bookEdit/id" th:href="${'/bookEdit/' + book.id}"class="btn btn-info" role="button">Edit</a>
+                <a href="/bookDelete/id" th:href="${'/bookDelete/' + book.id}"class="btn btn-danger" role="button">Delete</a>
             </td>
         </tr>
         </tbody>

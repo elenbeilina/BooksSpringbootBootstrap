@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 import  org.springframework.ui.Model;
+import org.springframework.web.servlet.ModelAndView;
 
 
 @Controller
@@ -14,29 +15,53 @@ public class BooksController {
     @Autowired
     private BookRepository bookRepository;
 
-    @RequestMapping(value="/")
-    public String bookList(Model model) {
-        model.addAttribute("bookList", bookRepository.findAll());
-        return "bookList";
+    @GetMapping({"/","bookList"})
+    public ModelAndView bookList() {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("bookList",bookRepository.findAll());
+        modelAndView.setViewName("bookList");
+        return modelAndView;
     }
 
-    @GetMapping({"/bookEdit","/bookEdit/{id}"})
-    public String bookEdit(Model model, @PathVariable(required = false, name = "id") Integer id) {
 
-        model.addAttribute("book", bookRepository.findById(id));
-
-        return "bookEdit";
+    @GetMapping("book/new")
+    public ModelAndView addNewBook() {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("book", new Book());
+        modelAndView.setViewName("bookEdit");
+        return modelAndView;
     }
 
-    @PostMapping("/bookEdit")
-    public String saveBook(Model model, Book book) {
-        bookRepository.save(book);
-        model.addAttribute("bookList", bookRepository.findAll());
-        return "bookList";
+
+    @GetMapping("/bookEdit/{id}")
+    public ModelAndView bookEdit(@PathVariable Integer id) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("book", bookRepository.getOne(id));
+        modelAndView.setViewName("bookEdit");
+        return modelAndView;
+    }
+
+    @PostMapping("/bookSave")
+    public String saveBook( Book book, @RequestParam Integer id,
+                           @RequestParam String title, @RequestParam String author) {
+
+        if(id != null)
+        {
+            Book editBook = bookRepository.getOne(id);
+            editBook.setAuthor(author);
+            editBook.setTitle(title);
+            bookRepository.save(editBook);
+        }
+        else
+        {
+            bookRepository.save(book);
+        }
+
+        return "redirect:/bookList";
     }
 
     @GetMapping("/bookDelete/{id}")
-    public String bookDelete(Model model, @PathVariable(required = true, name = "id") Integer id) {
+    public String bookDelete(Model model, @PathVariable Integer id) {
         bookRepository.deleteById(id);
         model.addAttribute("bookList", bookRepository.findAll());
         return "bookList";
